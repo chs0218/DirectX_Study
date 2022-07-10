@@ -3,6 +3,9 @@
 //
 
 #pragma once
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h> // 메모리 할당 및 할당 해제를 추적하는 함수들이 정의되어 있음.
 
 #include "targetver.h"
 #define WIN32_LEAN_AND_MEAN             // 거의 사용되지 않는 내용을 Windows 헤더에서 제외합니다.
@@ -28,9 +31,6 @@
 
 #include <DirectXCollision.h>
 #include <DXGIDebug.h>
-
-#include <vector>
-#include <memory>
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
