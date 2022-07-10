@@ -19,7 +19,7 @@ private:
 	UINT m_nSwapChainBufferIndex;	// 현재 스왑체인의 후면 버퍼 인덱스이다.
 
 	std::unique_ptr<std::vector<ID3D12Resource>> m_ppd3RenderTargetBuffers;		// 렌더 타겟 버퍼 포인터
-	std::unique_ptr<ID3D12DescriptorHeap>* m_pd3dRtvDescriptorHeap;	// 서술자 힙 인터페이스 포인터
+	std::unique_ptr<ID3D12DescriptorHeap> m_pd3dRtvDescriptorHeap;	// 서술자 힙 인터페이스 포인터
 	UINT m_nRtvDescriptorIncrementSize;		// 렌더 타겟 서술자 원소의 크기
 
 	std::unique_ptr<ID3D12Resource> m_pd3dDepthStencilBuffer;		// 깊이-스텐실 버퍼
@@ -49,6 +49,9 @@ public:
 	void CreateRtvAndDsvDescriptorHeaps();		// 디바이스 생성 함수
 	void CreateDirect3DDevice();	// 서술자 힙 생성 함수
 	void CreateCommandQueueAndList();		// 명령 큐/할당자/리스트 생성 함수
+
+	void CreateRenderTargetViews();		// 렌더 타겟 뷰를 생성하는 함수이다.
+	void CreateDepthStencilView();		// 깊이-스텐실 뷰를 생성하는 함수이다.
 
 	void BuildObjects();	// 렌더링할 메쉬와 게임 객체를 생성하는 함수
 	void ReleaseObjects();	// 렌더링할 메쉬와 게임 객체를 소멸하는 함수
