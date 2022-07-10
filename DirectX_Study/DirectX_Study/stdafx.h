@@ -13,3 +13,28 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+
+#include <string>
+#include <wrl.h>
+#include <shellapi.h>
+
+#include <d3d12.h>				// DirectX3D 12 API 함수를 사용하기 위한 헤더파일
+#include <dxgi1_4.h>
+
+#include <D3Dcompiler.h>
+#include <DirectXMath.h>
+#include <DirectXPackedVector.h>
+#include <DirectXColors.h>
+
+#include <DirectXCollision.h>
+#include <DXGIDebug.h>
+
+using namespace DirectX;
+using namespace DirectX::PackedVector;
+
+using Microsoft::WRL::ComPtr;
+
+#pragma comment(lib, "d3dcompiler.lib")
+#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "dxguid.lib")
