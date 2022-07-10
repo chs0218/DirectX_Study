@@ -29,6 +29,9 @@
 #include <DirectXCollision.h>
 #include <DXGIDebug.h>
 
+#include <vector>
+#include <memory>
+
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
@@ -40,5 +43,5 @@ using Microsoft::WRL::ComPtr;
 #pragma comment(lib, "dxguid.lib")
 
 #define FRAME_BUFFER_WIDTH 1024
-#define FRAme_BUFFER_WIDTH 1024
+#define FRAME_BUFFER_HEIGHT 1024
 

@@ -5,12 +5,12 @@ private:
 	HINSTANCE m_hInstance;
 	HWND m_hWnd;
 
-	int m_nWndClientHidth;
+	int m_nWndClientWidth;
 	int m_nWndClientHeight;
 
 	std::unique_ptr<IDXGIFactory4> m_pdxgiFactory;	// DXGI 팩토리 인터페이스에 대한 포인터이다.
-	std::unique_ptr<IDXGISwapChain3> m_dxgiSwapChain;	// 스왑 체인 인터페이스에 대한 포인터이다. 주로 디스플레이를 제어하기 위하여 필요하다.
-	std::unique_ptr<ID3D12Device> m_dxgiSwapChain;	// Direct3D 디바이스 인터페이스에 대한 포인터이다. 주로 리소스를 생성하기 위하여 필요하다.
+	std::unique_ptr<IDXGISwapChain3> m_pdxgiSwapChain;	// 스왑 체인 인터페이스에 대한 포인터이다. 주로 디스플레이를 제어하기 위하여 필요하다.
+	std::unique_ptr<ID3D12Device> m_pd3dDevice;	// Direct3D 디바이스 인터페이스에 대한 포인터이다. 주로 리소스를 생성하기 위하여 필요하다.
 
 	bool m_bMsaa4xEnable = false;
 	UINT m_nMsaa4xQualityLevels = 0;	// MSAA 다중 샘플링을 활성화하고 다중 샘플링 레벨을 설정한다.
@@ -19,7 +19,7 @@ private:
 	UINT m_nSwapChainBufferIndex;	// 현재 스왑체인의 후면 버퍼 인덱스이다.
 
 	std::unique_ptr<std::vector<ID3D12Resource>> m_ppd3RenderTargetBuffers;		// 렌더 타겟 버퍼 포인터
-	std::unique_ptr<ID3D12DescriptorHeap> m_ppd3RenderTargetBuffers;	// 서술자 힙 인터페이스 포인터
+	std::unique_ptr<ID3D12DescriptorHeap>* m_pd3dRtvDescriptorHeap;	// 서술자 힙 인터페이스 포인터
 	UINT m_nRtvDescriptorIncrementSize;		// 렌더 타겟 서술자 원소의 크기
 
 	std::unique_ptr<ID3D12Resource> m_pd3dDepthStencilBuffer;		// 깊이-스텐실 버퍼
