@@ -1,7 +1,9 @@
 ﻿  DirectX_Study.cpp
   GameFramework.cpp
-D:\Visual Studio\Project\DirectX_Study\DirectX_Study\DirectX_Study\GameFramework.h(6,2): error C2275: 'HWND': 이 형식을 식으로 잘못 사용했습니다.
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\shared\windef.h(39): message : 'HWND' 선언을 참조하십시오.
-D:\Visual Studio\Project\DirectX_Study\DirectX_Study\DirectX_Study\GameFramework.h(6,7): error C2098: 데이터 멤버 'm_hInstance' 뒤에 예기치 않은 토큰이 있습니다.
-D:\Visual Studio\Project\DirectX_Study\DirectX_Study\DirectX_Study\GameFramework.h(6,7): error C2146: 구문 오류: ';'이(가) 'm_hWnd' 식별자 앞에 없습니다.
   stdafx.cpp
+  코드를 생성하고 있습니다.
+  27 of 27 functions (100.0%) were compiled.
+    23 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  코드를 생성했습니다.
+  DirectX_Study.vcxproj -> D:\Visual Studio\Project\DirectX_Study\DirectX_Study\x64\Release\DirectX_Study.exe

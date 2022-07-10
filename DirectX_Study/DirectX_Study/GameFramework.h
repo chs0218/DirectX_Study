@@ -18,7 +18,7 @@ private:
 	static const UINT m_nSwapChainBuffers = 2;	// 스왑 체인의 후면 버퍼의 개수이다.
 	UINT m_nSwapChainBufferIndex;	// 현재 스왑체인의 후면 버퍼 인덱스이다.
 
-	ID3D12Resource* m_ppd3RenderTargetBuffers[m_nSwapChainBuffers];		// 렌더 타겟 버퍼 포인터
+	ID3D12Resource* m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];		// 렌더 타겟 버퍼 포인터
 	ID3D12DescriptorHeap* m_pd3dRtvDescriptorHeap;	// 서술자 힙 인터페이스 포인터
 	UINT m_nRtvDescriptorIncrementSize;		// 렌더 타겟 서술자 원소의 크기
 
@@ -36,14 +36,14 @@ private:
 	UINT64 m_nFenceValue;	// 펜스의 값
 	HANDLE m_hFenceEvent;	// 이벤트 핸들
 
-	D3D12_VIEWPORT m_d3dviewport;	// 뷰포트
+	D3D12_VIEWPORT m_d3dViewport;	// 뷰포트
 	D3D12_RECT m_d3dScissorRect;	// 씨저 사각형
 public:
 	CGameFramework();
 	~CGameFramework();
 
 	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);	// 프레임워크를 초기화하는 함수
-	void OnDestory();
+	void OnDestroy();
 
 	void CreateSwapChain();		// 스왑 체인 생성 함수
 	void CreateRtvAndDsvDescriptorHeaps();		// 디바이스 생성 함수
