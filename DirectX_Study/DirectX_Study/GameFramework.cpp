@@ -3,28 +3,9 @@
 
 CGameFramework::CGameFramework()
 {
-	m_pdxgiFactory = NULL;
-	m_pdxgiSwapChain = NULL;
-	m_pd3dDevice = NULL;
-
-	m_pd3dCommandAllocator = NULL;
-	m_pd3dCommandQueue = NULL;
-	m_pd3dPipelineState = NULL;
-	m_pd3dCommandList = NULL;
-
-	for (int i = 0; i < m_nSwapChainBuffers; ++i)
-		m_ppd3dRenderTargetBuffers[i] = NULL;
-	m_pd3dRtvDescriptorHeap = NULL;
 	m_nRtvDescriptorIncrementSize = 0;
-
-	m_pd3dDepthStencilBuffer = NULL;
-	m_pd3dDsvDescriptorHeap = NULL;
 	m_nDsvDescriptorIncrementSize = 0;
-
 	m_nSwapChainBufferIndex = 0;
-
-	m_hFenceEvent = NULL;
-	m_pd3dFence = NULL;
 	m_nFenceValue = 0;
 
 	m_nWndClientWidth = FRAME_BUFFER_WIDTH;
@@ -60,7 +41,20 @@ void CGameFramework::OnDestroy()
 	ReleaseObjects(); // 게임 객체를 소멸한다.
 
 	::CloseHandle(m_hFenceEvent);
+	for (int i = 0; i < m_nSwapChainBuffers; i++) if (m_ppd3dRenderTargetBuffers[i])
+		m_ppd3dRenderTargetBuffers[i]->Release();
+	if (m_pd3dRtvDescriptorHeap) m_pd3dRtvDescriptorHeap->Release();
+	if (m_pd3dDepthStencilBuffer) m_pd3dDepthStencilBuffer->Release();
+	if (m_pd3dDsvDescriptorHeap) m_pd3dDsvDescriptorHeap->Release();
+	if (m_pd3dCommandAllocator) m_pd3dCommandAllocator->Release();
+	if (m_pd3dCommandQueue) m_pd3dCommandQueue->Release();
+	if (m_pd3dPipelineState) m_pd3dPipelineState->Release();
+	if (m_pd3dCommandList) m_pd3dCommandList->Release();
+	if (m_pd3dFence) m_pd3dFence->Release();
 	m_pdxgiSwapChain->SetFullscreenState(FALSE, NULL);
+	if (m_pdxgiSwapChain) m_pdxgiSwapChain->Release();
+	if (m_pd3dDevice) m_pd3dDevice->Release();
+	if (m_pdxgiFactory) m_pdxgiFactory->Release();
 #if defined(_DEBUG)
 	IDXGIDebug1* pdxgiDebug = NULL;
 	DXGIGetDebugInterface1(0, __uuidof(IDXGIDebug1), (void**)&pdxgiDebug);
@@ -96,7 +90,7 @@ void CGameFramework::CreateSwapChain()
 	dxgiSwapChainFullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	dxgiSwapChainFullScreenDesc.Windowed = TRUE;
 
-	m_pdxgiFactory->CreateSwapChainForHwnd(m_pd3dCommandQueue, m_hWnd, &dxgiSwapChainDesc, &dxgiSwapChainFullScreenDesc, NULL, (IDXGISwapChain1**)&m_pdxgiSwapChain);
+	m_pdxgiFactory->CreateSwapChainForHwnd(m_pd3dCommandQueue.Get(), m_hWnd, &dxgiSwapChainDesc, &dxgiSwapChainFullScreenDesc, NULL, (IDXGISwapChain1**)m_pdxgiSwapChain.GetAddressOf());
 	//스왑체인을 생성한다. 
 
 	m_pdxgiFactory->MakeWindowAssociation(m_hWnd, DXGI_MWA_NO_ALT_ENTER);
@@ -177,7 +171,7 @@ void CGameFramework::CreateCommandQueueAndList()
 	d3dCommandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 	HRESULT hResult = m_pd3dDevice->CreateCommandQueue(&d3dCommandQueueDesc,_uuidof(ID3D12CommandQueue), (void**)&m_pd3dCommandQueue);	//직접(Direct) 명령 큐를 생성한다.
 	hResult = m_pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&m_pd3dCommandAllocator);	//직접(Direct) 명령 할당자를 생성한다. 
-	hResult = m_pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_pd3dCommandList);	//직접(Direct) 명령 리스트를 생성한다. 
+	hResult = m_pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator.Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_pd3dCommandList);	//직접(Direct) 명령 리스트를 생성한다. 
 	hResult = m_pd3dCommandList->Close();	//명령 리스트는 생성되면 열린(Open) 상태이므로 닫힌(Closed) 상태로 만든다. 
 }
 
@@ -205,7 +199,7 @@ void CGameFramework::CreateRenderTargetViews()
 	for (UINT i = 0; i < m_nSwapChainBuffers; i++)
 	{
 		m_pdxgiSwapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void**)&m_ppd3dRenderTargetBuffers[i]);
-		m_pd3dDevice->CreateRenderTargetView(m_ppd3dRenderTargetBuffers[i], NULL, d3dRtvCPUDescriptorHandle);
+		m_pd3dDevice->CreateRenderTargetView(m_ppd3dRenderTargetBuffers[i].Get(), NULL, d3dRtvCPUDescriptorHandle);
 		d3dRtvCPUDescriptorHandle.ptr += m_nRtvDescriptorIncrementSize;
 	}
 }
@@ -239,7 +233,7 @@ void CGameFramework::CreateDepthStencilView()
 		&d3dResourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, 
 		&d3dClearValue, __uuidof(ID3D12Resource), (void**)&m_pd3dDepthStencilBuffer);	//깊이-스텐실 버퍼를 생성한다. 
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer, NULL, d3dDsvCPUDescriptorHandle);	//깊이-스텐실 버퍼 뷰를 생성한다. 
+	m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer.Get(), NULL, d3dDsvCPUDescriptorHandle);	//깊이-스텐실 버퍼 뷰를 생성한다. 
 }
 
 void CGameFramework::BuildObjects()
@@ -330,7 +324,7 @@ void CGameFramework::WaitForGpuComplete()
 	m_nFenceValue++;
 	//CPU 펜스의 값을 증가한다. 
 	const UINT64 nFence = m_nFenceValue;
-	HRESULT hResult = m_pd3dCommandQueue->Signal(m_pd3dFence, nFence);
+	HRESULT hResult = m_pd3dCommandQueue->Signal(m_pd3dFence.Get(), nFence);
 	//GPU가 펜스의 값을 설정하는 명령을 명령 큐에 추가한다. 
 	if (m_pd3dFence->GetCompletedValue() < nFence)
 	{
@@ -345,14 +339,14 @@ void CGameFramework::FrameAdvance()
 	ProcessInput();
 	AnimateObjects();
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
-	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
 	//명령 할당자와 명령 리스트를 리셋한다.
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
 	::ZeroMemory(&d3dResourceBarrier, sizeof(D3D12_RESOURCE_BARRIER));
 	d3dResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	d3dResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	d3dResourceBarrier.Transition.pResource =
-		m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex];
+		m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get();
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -395,7 +389,7 @@ void CGameFramework::FrameAdvance()
 	hResult = m_pd3dCommandList->Close();
 	//명령 리스트를 닫힌 상태로 만든다. 
 
-	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
+	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList.Get() };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 	//명령 리스트를 명령 큐에 추가하여 실행한다.
 
